@@ -59,7 +59,8 @@ nav {
   position: absolute;
 }
 main {
-   position: absolute;
-   margin-top: 60px;
+    top: 60px;
+    position: absolute;
+    width: 100%;
 }
 </style>
