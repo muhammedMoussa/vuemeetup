@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import * as firebase from 'firebase'
 import App from './App'
+import AlertComp from './shared/Alert.vue'
 import router from './router'
 import { store } from './store'
 import DateFilter from './filters/date'
@@ -9,6 +10,8 @@ import 'vuetify/dist/vuetify.min.css'
 
 Vue.use(Vuetify)
 Vue.filter('date', DateFilter)
+Vue.component('app-alert', AlertComp)
+
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */
