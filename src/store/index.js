@@ -12,8 +12,8 @@ export const store = new Vuex.Store({
         id: 'afajfjadfaadfa323',
         title: 'Meetup in New York',
         date: new Date(),
-        location: 'New Yourk',
-        description: 'New Yourk!'
+        location: 'New York',
+        description: 'New York, New York!'
       },
       {
         imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/7a/Paris_-_Blick_vom_gro%C3%9Fen_Triumphbogen.jpg',
@@ -21,7 +21,7 @@ export const store = new Vuex.Store({
         title: 'Meetup in Paris',
         date: new Date(),
         location: 'Paris',
-        description: 'Paris!'
+        description: 'It\'s Paris!'
       }
     ],
     user: null,
@@ -44,7 +44,7 @@ export const store = new Vuex.Store({
     setError (state, payload) {
       state.error = payload
     },
-    clearError (state, payload) {
+    clearError (state) {
       state.error = null
     }
   },
@@ -61,46 +61,84 @@ export const store = new Vuex.Store({
               title: obj[key].title,
               description: obj[key].description,
               imageUrl: obj[key].imageUrl,
-              location: obj[key].location,
-              date: obj[key].title,
-              time: obj[key].time
+              date: obj[key].date,
+              time: obj[key].time,
+              creatorId: obj[key].creatorId
             })
           }
           commit('setLoadedMeetups', meetups)
           commit('setLoading', false)
         })
-        .catch((error) => {
-          console.log(error)
-          commit('setLoading', false)
-        })
+        .catch(
+          (error) => {
+            console.log(error)
+            commit('setLoading', false)
+          }
+        )
     },
     createMeetup ({commit, getters}, payload) {
       const meetup = {
         title: payload.title,
         location: payload.location,
-        imageUrl: payload.imageUrl,
         description: payload.description,
         date: payload.date,
         time: payload.time,
         creatorId: getters.user.id
       }
+      let imageUrl
+      let key
       firebase.database().ref('meetups').push(meetup)
         .then((data) => {
-          const key = data.key
+          key = data.key
+          return key
+        })
+        .then(key => {
+          const filename = payload.image.name
+          const ext = filename.slice(filename.lastIndexOf('.'))
+          return firebase.storage().ref('meetups/' + key + '.' + ext).put(payload.image)
+        })
+        .then(fileData => {
+          imageUrl = fileData.metadata.downloadURLs[0]
+          return firebase.database().ref('meetups').child(key).update({imageUrl: imageUrl})
+        })
+        .then(() => {
           commit('createMeetup', {
             ...meetup,
+            imageUrl: imageUrl,
             id: key
           })
-          console.log(key)
         })
         .catch((error) => {
           console.log(error)
         })
+      // Reach out to firebase and store it
     },
     signUserUp ({commit}, payload) {
       commit('setLoading', true)
       commit('clearError')
       firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password)
+        .then(
+          user => {
+            commit('setLoading', false)
+            const newUser = {
+              id: user.uid,
+              registeredMeetups: []
+            }
+            commit('setUser', newUser)
+          }
+        )
+        .catch(
+          error => {
+            commit('setLoading', false)
+            commit('setError', error)
+            console.log(error)
+          }
+        )
+    },
+    signUserIn ({commit}, payload) {
+      commit('setLoading', true)
+      commit('clearError')
+      firebase.auth().signInWithEmailAndPassword(payload.email, payload.password)
         .then(
           user => {
             commit('setLoading', false)
@@ -125,27 +163,6 @@ export const store = new Vuex.Store({
     logout ({commit}) {
       firebase.auth().signOut()
       commit('setUser', null)
-    },
-    signUserIn ({commit}, payload) {
-      commit('setLoading', true)
-      commit('clearError')
-      firebase.auth().signInWithEmailAndPassword(payload.email, payload.password)
-        .then(
-          user => {
-            const newUser = {
-              id: user.uid,
-              registeredMeetups: []
-            }
-            commit('setUser', newUser)
-          }
-        )
-        .catch(
-          error => {
-            commit('setLoading', false)
-            commit('setError', error)
-            console.log(error)
-          }
-        )
     },
     clearError ({commit}) {
       commit('clearError')
