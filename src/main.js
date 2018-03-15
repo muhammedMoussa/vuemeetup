@@ -6,11 +6,13 @@ import AlertComp from './shared/Alert.vue'
 import router from './router'
 import { store } from './store'
 import DateFilter from './filters/date'
+import Dialog from './components/Meetup/Edit/Dialog.vue'
 import 'vuetify/dist/vuetify.min.css'
 
 Vue.use(Vuetify)
 Vue.filter('date', DateFilter)
 Vue.component('app-alert', AlertComp)
+Vue.component('app-edit-meetup-details-dialog', Dialog)
 
 Vue.config.productionTip = false
 
