@@ -7,11 +7,13 @@ import router from './router'
 import { store } from './store'
 import DateFilter from './filters/date'
 import Dialog from './components/Meetup/Edit/Dialog.vue'
+import RegestirDialog from './components/Meetup/Register/RegisterDialog.vue'
 import 'vuetify/dist/vuetify.min.css'
 
 Vue.use(Vuetify)
 Vue.filter('date', DateFilter)
 Vue.component('app-alert', AlertComp)
+Vue.component('app-register', RegestirDialog)
 Vue.component('app-edit-meetup-details-dialog', Dialog)
 
 Vue.config.productionTip = false
