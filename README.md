@@ -1,6 +1,6 @@
 # vuemeetup
 
-> VueMeetup - Meetups website made with Vuejs, Vuetifyjs, Vux and Firebase
+> VueMeetup - Meetups website made with Vuejs, Vuetifyjs, Vuex and Firebase
 
 ## Build Setup
 
